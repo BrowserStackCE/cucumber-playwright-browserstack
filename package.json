@@ -1,0 +1,29 @@
+{
+  "name": "cucumber-playwright-browserstack",
+  "version": "1.0.0",
+  "description": "Cucumber.js + Playwright integration with BrowserStack using the BrowserStack SDK",
+  "scripts": {
+    "sample-test": "browserstack-node-sdk cucumber-js features/search.feature",
+    "sample-local-test": "browserstack-node-sdk cucumber-js features/local.feature",
+    "sample-all-test": "browserstack-node-sdk cucumber-js features/",
+    "test": "cucumber-js",
+    "postinstall": "npm update browserstack-node-sdk"
+  },
+  "keywords": [
+    "cucumber",
+    "playwright",
+    "browserstack",
+    "e2e",
+    "testing"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@cucumber/cucumber": "^10.0.0",
+    "@playwright/test": "^1.58.2",
+    "browserstack-node-sdk": "latest"
+  },
+  "dependencies": {
+    "playwright": "latest"
+  }
+}
