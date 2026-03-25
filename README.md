@@ -6,17 +6,17 @@ Cucumber.js + Playwright integration with BrowserStack for E2E functional testin
 
 ```
 ├── browserstack.yml              # BrowserStack configuration (platforms, credentials, etc.)
-├── cucumber.js                   # Cucumber configuration
+├── cucumber.js                   # Cucumber runner configuration
 ├── features/
-│   ├── search.feature            # Sample product search / navigation tests
-│   ├── cart.feature              # Sample add-to-cart test
+│   ├── search.feature            # Product search & vendor filtering scenarios
+│   ├── cart.feature              # Add-to-cart scenario
 │   ├── local.feature             # BrowserStack Local tunnel test
 │   ├── step_definitions/
 │   │   ├── search-steps.js       # Step definitions for search scenarios
 │   │   ├── cart-steps.js         # Step definitions for cart scenarios
 │   │   └── local-steps.js        # Step definitions for local testing
 │   └── support/
-│       ├── world.js              # Custom World: Playwright browser lifecycle + BrowserStack CDP
+│       ├── world.js              # Custom World: Playwright browser lifecycle
 │       └── hooks.js              # Before/After hooks (browser setup, screenshot on failure)
 ├── package.json
 └── README.md
@@ -27,6 +27,8 @@ Cucumber.js + Playwright integration with BrowserStack for E2E functional testin
 1. Clone the repo and install dependencies:
 
 ```bash
+git clone <repo-url>
+cd cucumber-playwright-browserstack
 npm install
 ```
 
@@ -41,9 +43,9 @@ Or update `userName` and `accessKey` in `browserstack.yml`.
 
 ## Running Tests
 
-### Run sample tests on BrowserStack
+### Run search tests on BrowserStack
 
-Runs the search and product features against [bstackdemo.com](https://bstackdemo.com/) on the platforms defined in `browserstack.yml`:
+Runs `search.feature` against [bstackdemo.com](https://bstackdemo.com/) across all platforms defined in `browserstack.yml`:
 
 ```bash
 npm run sample-test
@@ -57,9 +59,17 @@ Verifies that the BrowserStack Local tunnel is working:
 npm run sample-local-test
 ```
 
+### Run all tests on BrowserStack
+
+Runs every feature file (search, cart, local) across all platforms:
+
+```bash
+npm run sample-all-test
+```
+
 ### Run tests locally (without BrowserStack)
 
-If you want to run the Cucumber tests directly (connects to BrowserStack CDP by default — you can modify `world.js` to launch a local browser instead):
+Runs the Cucumber tests directly using a local Playwright browser:
 
 ```bash
 npm test
@@ -67,20 +77,31 @@ npm test
 
 ## How It Works
 
-- **Cucumber.js** provides the BDD test structure with Gherkin feature files.
-- **Playwright** handles all browser automation (navigation, clicks, assertions).
-- **BrowserStack SDK** (`browserstack-node-sdk`) wraps the Cucumber runner to manage platform distribution, parallel execution, BrowserStack Local tunneling, and test reporting.
-- The custom `World` class in `features/support/world.js` connects Playwright to BrowserStack via the CDP WebSocket endpoint (`wss://cdp.browserstack.com/playwright`).
+- **Cucumber.js** provides the BDD layer with Gherkin feature files and step definitions.
+- **Playwright** handles browser automation (navigation, clicks, assertions) via `chromium.launch()`.
+- **BrowserStack SDK** (`browserstack-node-sdk`) wraps the Cucumber runner and intercepts Playwright's browser launch. It routes execution to BrowserStack, managing platform distribution, parallel execution, Local tunneling, and test reporting — all configured through `browserstack.yml`.
 
 ## Configuration
 
 ### Platforms
 
-Edit `browserstack.yml` to change which browsers / OS combinations to test on. See the [full platform list](https://www.browserstack.com/list-of-browsers-and-platforms/automate).
+Edit the `platforms` section in `browserstack.yml` to change which browsers and OS combinations to test on. The default configuration runs on:
+
+| OS          | Browser             |
+|-------------|---------------------|
+| Windows 11  | Chrome (latest)     |
+| macOS Ventura | WebKit (latest)   |
+| Windows 11  | Firefox (latest)    |
+
+See the [full platform list](https://www.browserstack.com/list-of-browsers-and-platforms/automate).
+
+### Parallelism
+
+Adjust `parallelsPerPlatform` in `browserstack.yml` to control how many parallel sessions run per platform.
 
 ### Timeouts
 
-The default Cucumber timeout is set to 60 seconds in `features/support/world.js`. Adjust via `setDefaultTimeout()`.
+The default Cucumber step timeout is 60 seconds, set in `features/support/world.js` via `setDefaultTimeout()`.
 
 ## Viewing Results
 
